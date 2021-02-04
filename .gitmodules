@@ -1,0 +1,3 @@
+[submodule "immcantation"]
+	path = immcantation
+	url = git@bitbucket.org:kleinstein/immcantation.git

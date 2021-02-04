@@ -1,0 +1,12 @@
+name: example-changeo
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - changeo
+  # optional requirements
+  - muscle>=3.8
+  - tbl2asn
+  - igblast>=1.6
+  - igphyml>=1.0.5
