@@ -1,3 +1,6 @@
+# Just some shared settings for the conda environment and make.  Not much to
+# see here.
+
 export PATH := $(PWD)/immcantation/scripts:$(PATH)
 # Needed for BuildTrees.py
 export IGPHYML_PATH=$(CONDA_PREFIX)/share/igphyml/motifs

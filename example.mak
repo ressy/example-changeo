@@ -1,3 +1,8 @@
+# The "main" example workflow, using the AIRR_Example tarball from
+# immcantation.  This starts with deduplicated pRESTO output sequences and
+# ends with an IgPhyML tree for each clonal cluster, rooted on an inferred
+# germline.
+
 all_example: HD13M_igblast_db-pass_parse-select_clone-pass_germ-pass.tsv
 
 clean_example:

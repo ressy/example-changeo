@@ -1,3 +1,11 @@
+# The small standalone IgPhyML examples.  The visualizations in the two PDFs
+# here should match those shown on this page:
+#
+# https://changeo.readthedocs.io/en/stable/examples/igphyml.html
+#
+# In my output they mostly do, though the branch lengths in ex_igphyml-pass.pdf
+# are 1% of what's shown in the documentation.
+
 all_igphyml: ex_igphyml-pass.pdf sample1_igphyml-pass.pdf
 
 clean_igphyml:
