@@ -1,6 +1,7 @@
 export PATH := $(PWD)/immcantation/scripts:$(PATH)
+# Needed for BuildTrees.py
+export IGPHYML_PATH=$(CONDA_PREFIX)/share/igphyml/motifs
 SHELL=/bin/bash -o pipefail
-IGBLASTURL = ftp://ftp.ncbi.nih.gov/blast/executables/igblast/release
 
 # keep all intermediate files
 # (".SECONDARY with no prerequisites causes all targets to be treated as
@@ -8,7 +9,7 @@ IGBLASTURL = ftp://ftp.ncbi.nih.gov/blast/executables/igblast/release
 # intermediate)")
 .SECONDARY:
 
-all: HD13M_igblast_db-pass_parse-select_clone-pass.tsv
+all: HD13M_igblast_db-pass_parse-select_clone-pass_germ-pass.tsv
 
 realclean: clean
 	rm -f AIRR_Example.tar.gz
@@ -31,17 +32,23 @@ AIRR_Example/HD13M.fasta: AIRR_Example.tar.gz
 	tar xzvf $^ AIRR_Example
 	touch $@
 
+# There are used in a few different places as the original, IMGT-gapped (for V)
+# germline reference.  Equivalently they could come from the imgt/ files.
+REF_FASTAS = $(addprefix AIRR_Example/IMGT_Human_IGH,$(addsuffix .fasta,V D J))
+
 ### Configuring IgBLAST
 # https://changeo.readthedocs.io/en/stable/examples/igblast.html#configuring-igblast
 
 igblast/.done:
-	# has some old URLs
+	# The full download has some old URLs, but we shouldn't need those
+	# anymore anyway, with the newer igblast versions.
 	# https://bitbucket.org/kleinstein/immcantation/issues/73/
-	#fetch_igblastdb.sh -o igblast
-	mkdir -p $(dir $@)
-	wget -q -r -nH --cut-dirs=5 --no-parent $(IGBLASTURL)/database -P $(dir $@)database
-	wget -q -r -nH --cut-dirs=5 --no-parent $(IGBLASTURL)/old_internal_data -P $(dir $@)/internal_data
-	wget -q -r -nH --cut-dirs=5 --no-parent $(IGBLASTURL)/old_optional_file -P $(dir $@)/optional_file
+	#fetch_igblastdb.sh -x -o igblast
+	# Another approach, since we're already using conda's igblast with its
+	# own IGDATA directory
+	mkdir -p igblast
+	cp -r $(CONDA_PREFIX)/share/igblast/internal_data igblast
+	cp -r $(CONDA_PREFIX)/share/igblast/optional_file igblast
 	touch $@
 
 # Downloads data from IMGT servers
@@ -87,7 +94,6 @@ $(DB): imgt/.done igblast/.done
 #
 # The output file should be roughly equivalent (as for the .fmt7 above) to
 # AIRR_Example/HD13M_db-pass.tsv
-REF_FASTAS = $(addprefix AIRR_Example/IMGT_Human_IGH,$(addsuffix .fasta,V D J))
 %_igblast_db-pass.tsv: %_igblast.fmt7 AIRR_Example/%.fasta
 	MakeDb.py igblast -i $< -s $(word 2,$^) -r $(REF_FASTAS) --extended
 
@@ -115,3 +121,21 @@ REF_FASTAS = $(addprefix AIRR_Example/IMGT_Human_IGH,$(addsuffix .fasta,V D J))
 # sure.
 %_clone-pass.tsv: %.tsv
 	DefineClones.py -d $^ --act set --model ham --norm len --dist 0.16 --failed
+
+### Reconstructing germline sequences
+
+# Adding germline sequences to the database
+# https://changeo.readthedocs.io/en/latest/examples/germlines.html#adding-germline-sequences-to-the-database
+
+# --cloned because we do have a clone_id column in our input (AIRR) file.
+%_germ-pass.tsv: %.tsv
+	CreateGermlines.py -d $^ -g dmask --cloned -r $(REF_FASTAS)
+
+# https://changeo.readthedocs.io/en/latest/examples/igphyml.html
+# The instructions on this page are for a small IgPhyML-provided example
+# dataset.  I'll try to adapt it to the same dataset we're working on already.
+
+# It looks like this can just prepare the input files for IgPhyML, but with
+# --igphyml it'll also run automatically.
+build_trees: HD13M_igblast_db-pass_parse-select_clone-pass_germ-pass.tsv
+	BuildTrees.py -d $^ --collapse --igphyml
