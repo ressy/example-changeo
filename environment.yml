@@ -10,3 +10,5 @@ dependencies:
   - tbl2asn
   - igblast>=1.6
   - igphyml>=1.0.5
+  # other Immcantation tools used
+  - r-alakazam
