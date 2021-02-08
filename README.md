@@ -12,7 +12,8 @@ These files try to step through the [Change-O] examples that use the
  5. [IgPhyML lineage tree analysis](https://changeo.readthedocs.io/en/stable/examples/igphyml.html)
 
 I've set this up with [conda] and GNU make so it runs a little differtly than
-the Docker approach the AIRR community is standardizing around.  In short:
+the [Docker approach](https://docs.airr-community.org/en/stable/swtools/airr_swtools_standard.html)
+the AIRR community is standardizing around.  In short:
 
     conda env update -f environment.yml
     conda activate example-changeo
@@ -20,3 +21,4 @@ the Docker approach the AIRR community is standardizing around.  In short:
 
 [Change-O]: https://changeo.readthedocs.io/en/stable/
 [Immcantation]: https://immcantation.readthedocs.io/en/stable/
+[conda]: https://docs.conda.io/en/latest/
