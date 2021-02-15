@@ -3,9 +3,10 @@
 # ends with an IgPhyML tree for each clonal cluster, rooted on an inferred
 # germline.
 
-all_example: HD13M_igblast_db-pass_parse-select_clone-pass_germ-pass.tsv
+all_example: HD13M_igblast_db-pass_parse-select_clone-pass_germ-pass_igphyml-pass.tab
 
 clean_example:
+	rm -rf HD13M_igblast_db-pass_parse-select_clone-pass_germ-pass/
 	rm -f HD13M_*
 
 ### Example Data
@@ -127,5 +128,5 @@ $(DB): imgt/.done igblast/.done
 
 # It looks like this can just prepare the input files for IgPhyML, but with
 # --igphyml it'll also run automatically.
-build_trees: HD13M_igblast_db-pass_parse-select_clone-pass_germ-pass.tsv
+%_igphyml-pass.tab: %.tsv
 	BuildTrees.py -d $^ --collapse --igphyml --nproc 40
